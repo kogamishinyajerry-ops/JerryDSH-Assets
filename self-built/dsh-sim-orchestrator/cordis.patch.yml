@@ -1,0 +1,52 @@
+# Apply to the pinned Web profile after installing this local package.
+# DSH_SIM_PYTHON names the isolated dsh-sim [mcp] venv executable.
+# The referenced API must already be running with its configured identity mode.
+- insert:
+    - id: preset-simulation
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: simulation
+        name: Simulation
+        description: Four native stages over the independent dsh-sim engineering service
+        order: 4
+        plugins:
+          - id: simulation-persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              complete: true
+              includeRuntimeContext: false
+              prefix: >-
+                You coordinate simulation work. Use sim_orchestrate for one bounded
+                plan, prepare, execute or review stage, retaining the task and evidence
+                references returned by dsh-sim. Preparation and run requests are asynchronous.
+                Missing inputs and human authorization are explicit blockers. An engineering
+                result is established by the service and its frozen evidence, never by an
+                Agent's successful turn. Keep REAL, MOCK and NOT_RUN distinctions visible.
+          - id: simulation-mcp
+            name: '@deepseek-ai/dsh-mcp-client'
+            config:
+              serverName: dsh_sim
+              transport: stdio
+              command: !!js process.env.DSH_SIM_PYTHON
+              args: ['-m', 'dsh_sim.mcp.server']
+              env:
+                DSH_SIM_API_URL: !!js process.env.DSH_SIM_API_URL || 'http://127.0.0.1:8600/api/v1'
+                DSH_SIM_AGENT_PROJECTS: !!js process.env.DSH_SIM_AGENT_PROJECTS || 'proj_a'
+                FASTMCP_CHECK_FOR_UPDATES: 'off'
+                FASTMCP_SHOW_SERVER_BANNER: 'false'
+              failOnStartupError: true
+              toolCallTimeoutMs: 60000
+          - id: simulation-orchestrator
+            name: jerry-dsh-sim-orchestrator
+            config:
+              providerName: spawn
+              serverName: dsh_sim
+              maxDepth: 1
+              stageTimeoutMs: 180000
+              maxInputBytes: 65536
+
+# The restore tool preserves these too. Keep them explicit in this opt-in overlay.
+- id: session-log-deepseek
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true

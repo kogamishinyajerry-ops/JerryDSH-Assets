@@ -1,0 +1,8 @@
+{
+  "name": "jerrydsh-recovery-zai-websearch",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0"
+  }
+}
