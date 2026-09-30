@@ -1,0 +1,38 @@
+{
+  "name": "dsh-profile-web",
+  "private": true,
+  "dependencies": {
+    "@linxin666/dsh-doctor": "^0.3.24",
+    "@michengai/dsh-automation": "^0.1.53",
+    "@michengai/dsh-skills-manager": "^1.1.7",
+    "@openviking/dsh-memory-plugin": "^0.5.9",
+    "@tt-a1i/archify-dsh": "^0.1.0",
+    "@xmanrui/dsh-im": "^4.32.0",
+    "dsh-aris": "^0.1.1",
+    "dsh-context": "^0.60.0",
+    "dsh-llm-approve-for-me": "github:alaxrpg/dsh-llm-approve-for-me",
+    "dsh-pdf-reader": "^0.2.0",
+    "dsh-session-guard": "^4.0.0",
+    "dshmarket": "^1.66.5"
+  },
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-pdf-reader",
+        "dsh-session-guard",
+        "dsh-llm-approve-for-me",
+        "dshmarket",
+        "@linxin666/dsh-doctor",
+        "@michengai/dsh-skills-manager",
+        "@michengai/dsh-automation",
+        "dsh-aris",
+        "@tt-a1i/archify-dsh",
+        "@openviking/dsh-memory-plugin",
+        "dsh-context",
+        "@xmanrui/dsh-im"
+      ]
+    }
+  }
+}

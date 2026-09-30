@@ -1,0 +1,132 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+# ComfyUI MCP server (comfyui-mcp@0.51.56) — local install at ~/.dsh/mcp/comfyui-mcp
+# Tools appear as mcp__comfyui__<name> in every new conversation of this profile.
+- insert:
+    - id: mcp-comfyui
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: comfyui
+        transport: stdio
+        command: node
+        args:
+          - /Users/Zhuanz/.dsh/mcp/comfyui-mcp/node_modules/comfyui-mcp/dist/index.js
+        cwd: /Users/Zhuanz/.dsh/mcp/comfyui-mcp
+        env:
+          COMFYUI_URL: http://127.0.0.1:8188
+          COMFYUI_PATH: /Users/Zhuanz/projects/jerry-personal/JerryComfyUI/ComfyUI
+        toolCallTimeoutMs: 3600000
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+# 民机航空域聚合插件(2026-10 整编,原 4 插件合并):
+#   civair_kb_* 知识底座(sidecar :8791 自动拉起;配套 skill: civair-kb)
+#   comac_*     Benchmark Harness 六工具(薄代理 JerryDSH-COMACBench,长跑脱离+--resume)
+#   pdf_fta_*   PDF→medini-like 故障树(KLW 中期评审,后端 :8000)
+#   fmea_*      FMEA/FTA 两道门(fail-closed,COMAC_FMEA_FTA_Manager_8024)
+- insert:
+    - id: jerry-aero
+      name: /Users/Zhuanz/.dsh/plugins/jerry-aero/index.js
+# 工程学校(jerry-school,原 dsh-engineering-school 改名平移,技能不变):
+# 8 个运行时技能——6 个模型可调用方法论(eng-grilling/tdd/diagnosing-bugs/
+# codebase-design/domain-modeling/code-review) + 2 个用户入口(eng-idea-to-ship
+# 主流导航 / dsh-school 教学课程+双语词典)。改技能正文即时生效,重启刷新目录。
+- insert:
+    - id: jerry-school
+      name: /Users/Zhuanz/.dsh/plugins/jerry-school/index.js
+# Z.ai/BigModel 联网搜索 MCP 桥(~/.dsh/mcp/zai-mcp/bridge.mjs,e2e 实测 2026-08-31):
+# 工具 mcp__zai__web_search = coding 端点内置 web_search 通道(走 GLM Coding
+# Plan 模型额度,不开 MCP 资源包即可用)。key 启动时从 macOS Keychain 服务
+# glm-api-key 读取,不落盘。官方 MCP 网关直通(webSearchSogou/Quark,需资源包)
+# 见桥内 ZAI_ENABLE_GATEWAY=1,默认关。
+- insert:
+    - id: mcp-zai-websearch
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: zai
+        transport: stdio
+        command: node
+        args:
+          - /Users/Zhuanz/.dsh/mcp/zai-mcp/bridge.mjs
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+
+# [2026-09-29] 暂禁 vision-toolkit：0.1.44/0.1.45 仅适配 dsh ≤0.1.5，
+# 0.1.7-rc.2 移除 ctx.settings.register 导致激活失败。等上游发 0.1.7 兼容版后
+# 删除本条即可恢复（bundle 仍保留在 package.json）。
+- id: vision-toolkit
+  disabled: true
+
+# [2026-09-18] 0.1.6 隐私红线：关闭会话事件上报（内网部署红线，见 research/06-update-tracker.md §3.7）
+- id: session-log-deepseek
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
+- id: ui-settings-general
+  name: "@deepseek-ai/dsh-client-ui-settings-general"
+  config:
+    welcomeNoticeVersion: 2026-09-28.1
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: zai-coding-cn
+    model: glm-5.3
+    reasoningEffort: max
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      # [2026-09-30] 智谱 GLM Coding Plan（新 key + coding 专用端点，实测 curl 双协议 200）
+      # Anthropic 协议备用端点: https://open.bigmodel.cn/api/anthropic
+      zai-coding-cn:
+        api: openai-completions
+        baseURL: https://open.bigmodel.cn/api/coding/paas/v4
+        apiKeyEnv: ZAI_CODING_CN_API_KEY
+        models:
+          - id: glm-5.3
+            name: GLM-5.3
+            contextWindow: 1000000
+            maxTokens: 131072
+            input:
+              - text
+              - image
+          - id: glm-5.3-flash
+            name: GLM-5.3-Flash
+            contextWindow: 1000000
+            maxTokens: 131072
+            input:
+              - text
+              - image
+          - id: glm-5.3-flashx
+            name: GLM-5.3-FlashX
+            contextWindow: 1000000
+            maxTokens: 131072
+            input:
+              - text
+              - image
+          - id: glm-5.2
+            name: GLM-5.2
+            contextWindow: 1000000
+            maxTokens: 131072
+            input:
+              - text
+          - id: glm-4.7
+            name: GLM-4.7
+            contextWindow: 200000
+            maxTokens: 128000
+            input:
+              - text
+      minimax-cn:
+        models:
+          - id: MiniMax-M3
+            name: MiniMax-M3
+            contextWindow: 1000000
+            maxTokens: 128000
+        apiKeyEnv: MINIMAX_CN_API_KEY
+- id: ui-theme
+  name: "@deepseek-ai/dsh-client-ui-theme"
+  config:
+    preference: light

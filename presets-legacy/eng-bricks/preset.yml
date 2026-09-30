@@ -1,0 +1,2 @@
+name: eng-bricks
+description: 工程积木池（B1 cad_step2stl / B3 mesh_stl2msh / B5 cfd_msh2field）——确定性机器件零 LLM，产物契约类型自动串联 step→stl→msh→field_png。

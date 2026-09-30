@@ -1,0 +1,8 @@
+{
+  "name": "jerry-school",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "description": "工程学校：把 aihero.dev/skills（Matt Pocock, MIT）的免费工程方法论深度整合为 DSH 运行时技能——既让 agent 按真实工程纪律工作（拷问/TDD/诊断/深模块/领域建模/双轴审查/idea→ship 主流），也教 DSH 使用者理解 agent 在做什么（dsh-school 课程+双语词典）。零依赖纯本地。"
+}

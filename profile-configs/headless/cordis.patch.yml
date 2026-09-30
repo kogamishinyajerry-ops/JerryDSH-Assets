@@ -1,0 +1,45 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+# 民机航空域聚合插件(2026-10 整编,原 pdf-fta + kb-civair 两条合并):
+#   civair_kb_* 知识底座(sidecar :8791) / comac_* 基准 /
+#   pdf_fta_* 故障树 / fmea_* 两道门
+- insert:
+    - id: jerry-aero
+      name: /Users/Zhuanz/.dsh/plugins/jerry-aero/index.js
+
+# [2026-09-18] 0.1.6 隐私红线：关闭会话事件上报（内网部署红线，见 research/06-update-tracker.md §3.7）
+- id: session-log-deepseek
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
+
+# [2026-09-30] 默认模型切 GLM Coding Plan（新 key + coding 端点）
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: zai-coding-cn
+    model: glm-4.7
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      # [2026-09-30] 智谱 GLM Coding Plan（实测 curl 200）
+      # Anthropic 协议备用: https://open.bigmodel.cn/api/anthropic
+      zai-coding-cn:
+        api: openai-completions
+        baseURL: https://open.bigmodel.cn/api/coding/paas/v4
+        apiKeyEnv: ZAI_CODING_CN_API_KEY
+        models:
+          - id: glm-4.7
+            name: GLM-4.7
+            contextWindow: 200000
+            maxTokens: 128000
+          - id: glm-5.3
+            name: GLM-5.3
+            contextWindow: 1000000
+            maxTokens: 131072
+          - id: glm-5.3-flash
+            name: GLM-5.3-Flash
+            contextWindow: 1000000
+            maxTokens: 131072

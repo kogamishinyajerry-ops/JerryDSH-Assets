@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSH 能力地图与内网落地 · 2026-09-30</title>
+<style>
+  :root {
+    --ink: #1a2233;
+    --ink-2: #45506a;
+    --ink-3: #8a93a8;
+    --bg: #fafbfd;
+    --panel: #ffffff;
+    --line: #e4e8f0;
+    --line-2: #d0d6e2;
+    --accent: #2563eb;
+    --green: #15803d;
+    --green-bg: #f0f9f1;
+    --blue-bg: #f0f5ff;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+    --amber: #92400e;
+    --amber-bg: #fffbeb;
+    --violet: #6d28d9;
+    --violet-bg: #f5f3ff;
+    --gray-bg: #f4f6f9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.6; font-size: 14px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 48px 28px 80px; }
+
+  /* 头部 */
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 36px; }
+  header h1 { font-size: 26px; letter-spacing: -0.5px; }
+  header .sub { color: var(--ink-3); font-size: 13px; margin-top: 6px; }
+  .meta-strip { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; font-size: 12px; color: var(--ink-2); }
+  .meta-strip b { color: var(--ink); font-weight: 600; }
+
+  /* 通用 section */
+  section { margin-bottom: 44px; }
+  h2 { font-size: 18px; margin-bottom: 4px; letter-spacing: -0.3px; }
+  h2 .no { color: var(--ink-3); font-weight: 500; margin-right: 8px; font-size: 15px; }
+  .sec-desc { color: var(--ink-2); font-size: 13px; margin-bottom: 18px; }
+
+  /* 覆盖率大数字条 */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .stat .num { font-size: 26px; font-weight: 700; letter-spacing: -1px; }
+  .stat .num small { font-size: 13px; font-weight: 500; color: var(--ink-3); margin-left: 3px; }
+  .stat .lbl { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+  .c-green { color: var(--green); } .c-blue { color: var(--accent); }
+  .c-amber { color: var(--amber); } .c-red { color: var(--red); }
+
+  /* 业务四域 */
+  .domain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .domain { border-radius: 10px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); }
+  .domain h3 { font-size: 14px; margin-bottom: 8px; }
+  .domain ul { list-style: none; }
+  .domain li { font-size: 12.5px; color: var(--ink-2); padding: 3.5px 0 3.5px 14px; position: relative; }
+  .domain li::before { content: ""; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 2px; }
+  .d1 li::before { background: #93c5fd; } .d2 li::before { background: #86efac; }
+  .d3 li::before { background: #d8b4fe; } .d4 li::before { background: #fcd34d; }
+  .d1 h3 span, .d2 h3 span, .d3 h3 span, .d4 h3 span { font-size: 11px; color: var(--ink-3); font-weight: 400; margin-left: 6px; }
+
+  /* 版本演进时间线 */
+  .timeline { position: relative; padding-left: 22px; border-left: 2px solid var(--line-2); }
+  .ver { position: relative; margin-bottom: 18px; }
+  .ver::before { content: ""; position: absolute; left: -28px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--panel); border: 2.5px solid var(--ink-3); }
+  .ver.now::before { background: var(--accent); border-color: var(--accent); }
+  .ver .vhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .ver .vname { font-weight: 700; font-size: 13.5px; }
+  .ver .vdate { color: var(--ink-3); font-size: 11.5px; }
+  .ver .vcov { font-size: 11.5px; font-weight: 600; color: var(--green); }
+  .ver .vbody { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; max-width: 640px; }
+
+  /* 能力矩阵表 */
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th { font-size: 12px; color: var(--ink-2); text-align: left; padding: 10px 14px; background: var(--gray-bg); border-bottom: 1px solid var(--line-2); font-weight: 600; }
+  td { padding: 9px 14px; font-size: 12.5px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.cap { font-weight: 600; white-space: nowrap; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 600; }
+  .t-g { background: var(--green-bg); color: var(--green); }
+  .t-b { background: var(--blue-bg); color: var(--accent); }
+  .t-o { background: #fff7ed; color: #c2410c; }
+  .t-p { background: var(--violet-bg); color: var(--violet); }
+  .t-r { background: var(--red-bg); color: var(--red); }
+  .t-x { background: var(--gray-bg); color: var(--ink-3); }
+  .note { font-size: 11px; color: var(--ink-3); }
+
+  /* G 卡片 */
+  .g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .gcard { border-radius: 10px; padding: 14px 16px; border: 1px solid; }
+  .gcard .ghead { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .gcard .gid { font-weight: 700; font-size: 13px; }
+  .gcard .gstate { font-size: 10.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; color: #fff; }
+  .gcard p { font-size: 12px; color: var(--ink-2); }
+  .gcard .next { font-size: 11.5px; margin-top: 6px; font-weight: 600; }
+  .gs-done { background: var(--green-bg); border-color: #bbf7d0; } .gs-done .gstate { background: var(--green); }
+  .gs-run  { background: var(--blue-bg); border-color: #bfdbfe; } .gs-run .gstate { background: var(--accent); }
+  .gs-half { background: var(--amber-bg); border-color: #fde68a; } .gs-half .gstate { background: #b45309; }
+  .gs-info { background: var(--violet-bg); border-color: #ddd6fe; } .gs-info .gstate { background: var(--violet); }
+  .gs-hold { background: var(--gray-bg); border-color: var(--line-2); } .gs-hold .gstate { background: var(--ink-3); }
+
+  /* 交付路径 */
+  .path { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .path-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; gap: 12px; }
+  .path-item .pno { font-size: 20px; font-weight: 700; color: var(--accent); opacity: 0.35; line-height: 1; }
+  .path-item b { font-size: 13px; display: block; margin-bottom: 3px; }
+  .path-item span { font-size: 12px; color: var(--ink-2); }
+
+  footer { border-top: 1px solid var(--line-2); margin-top: 50px; padding-top: 16px; font-size: 11.5px; color: var(--ink-3); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .domain-grid, .g-grid, .path { grid-template-columns: 1fr; }
+    td.cap { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>DSH 能力地图与内网落地</h1>
+  <div class="sub">DeepSeek Harness 0.2.0 · 插件体系 · 自研资产 · 与 COMAC 内网业务的对照结论</div>
+  <div class="meta-strip">
+    <span>基线版本 <b>dsh 0.2.0-rc.2</b></span>
+    <span>插件 <b>12 个</b>（清退 5 个后）</span>
+    <span>调研窗口 <b>2026-08-12 至 09-30</b></span>
+    <span>数据源 <b>research/01-12 台账 + 本机实测 + 内网进展确认</b></span>
+  </div>
+</header>
+
+<!-- 一、总览 -->
+<section>
+  <h2><span class="no">01</span>总体结论</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="num c-green">11<small>/ 18</small></div><div class="lbl">业务象限已覆盖</div></div>
+    <div class="stat"><div class="num c-blue">3<small>层</small></div><div class="lbl">平台原生 + 插件 + 自研资产</div></div>
+    <div class="stat"><div class="num c-amber">2<small>项</small></div><div class="lbl">当前主战场（G4 数据面 / G5 协作）</div></div>
+    <div class="stat"><div class="num c-red">0<small>个</small></div><div class="lbl">需要重造的平台组件</div></div>
+  </div>
+  <p style="font-size:13px;color:var(--ink-2);max-width:720px">
+    七周追踪（0.1.0 至 0.2.0，五个关键版本）后，外网 DSH 工作站已闭环：18 个业务象限中 11 个满配覆盖，
+    覆盖主力不是插件而是自研资产（jerry-aero 四域、jerry-school 方法论、aris 科研技能）。
+    9 月 30 日经内网进展确认，原判 7 项缺口中 4 项已解决，年底交付路径收敛为「知识库 v1 + 离线包 + 模型例行更新」。
+  </p>
+</section>
+
+<!-- 二、业务全景 -->
+<section>
+  <h2><span class="no">02</span>COMAC 辅助动力部业务全景（四大域 18 象限）</h2>
+  <div class="sec-desc">这是覆盖判定的分母：核心工程 6 + 日常事务 4 + 协作治理 4 + 支撑环境 4。</div>
+  <div class="domain-grid">
+    <div class="domain d1">
+      <h3>核心工程域 <span>APU 设计师主战场</span></h3>
+      <ul>
+        <li>设计建模（CATIA / CMOS / PDM）</li>
+        <li>仿真分析（STAR-CCM+ / 性能计算）</li>
+        <li>安全性与适航（FMEA / FTA / 条款）</li>
+        <li>故障情报与知识（P-ACE / TeamBrain）</li>
+        <li>试验与验证（大纲 / 数据 / 报告）</li>
+        <li>智能平台建设（FDE 团队 / 工具链）</li>
+      </ul>
+    </div>
+    <div class="domain d2">
+      <h3>日常事务域 <span>高工时粘合剂</span></h3>
+      <ul>
+        <li>文档报告（技术报告 / PPT / 纪要成文）</li>
+        <li>会议协作（纪要智能体 / 多科室协调）</li>
+        <li>数据表格（台账 / TeamBrain 维护）</li>
+        <li>沟通传达（飞书 6 群 / 任务分派）</li>
+      </ul>
+    </div>
+    <div class="domain d3">
+      <h3>协作治理域 <span>团队合规基础</span></h3>
+      <ul>
+        <li>团队协作（群聊协作 / 共享记忆）</li>
+        <li>权限与密级（分区 / 审计）</li>
+        <li>模型算力（内网推理 / 配额）</li>
+        <li>知识沉淀（决策追溯 / 培养）</li>
+      </ul>
+    </div>
+    <div class="domain d4">
+      <h3>支撑环境域 <span>底座约束</span></h3>
+      <ul>
+        <li>内网物理隔离（U 盘摆渡 / 离线部署）</li>
+        <li>国产化信创（Win10 / 麒麟适配）</li>
+        <li>数据资产（P-ACE / KB / 图纸）</li>
+        <li>研发工具链（Git / 版本 / 构建）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 三、版本演进 -->
+<section>
+  <h2><span class="no">03</span>DSH 历代版本覆盖演进（7 周 5 节点）</h2>
+  <div class="sec-desc">覆盖率按 18 象限计。官方路线专注 Agent runtime 与个人生产力，团队协作与工程工具桥明确不做。</div>
+  <div class="timeline">
+    <div class="ver">
+      <div class="vhead"><span class="vname">0.1.0-rc.5</span><span class="vdate">08-12</span><span class="vcov">2/18</span></div>
+      <div class="vbody">纯 CLI harness：Bash / 文件读写 / 会话循环 / MCP 客户端机制。工程师个人工具。</div>
+    </div>
+    <div class="ver">
+      <div class="vhead"><span class="vname">0.1.1-rc.2</span><span class="vdate">08-21</span><span class="vcov">4/18</span></div>
+      <div class="vbody">Web UI 上线（非工程师可用的转折点）、cordis 插件体系、多模态附件、凭证安全重构。</div>
+    </div>
+    <div class="ver">
+      <div class="vhead"><span class="vname">0.1.5-rc.2</span><span class="vdate">09-10</span><span class="vcov">6/18</span></div>
+      <div class="vbody">工作区 / 会话治理成熟（Session V3）、SSRF 防护、Web 一次性 token 认证。内网离线包首版基于此代。</div>
+    </div>
+    <div class="ver">
+      <div class="vhead"><span class="vname">0.1.7-rc.2</span><span class="vdate">09-24</span><span class="vcov">10/18</span></div>
+      <div class="vbody">侧边栏终端、SSH 远程工作区、MCP v2、定时任务、Office 预览、插件管理页、Agent Teams、headless 事件流。subagent 可挂 Codex / Claude Code。1322 commits 的功能跃迁。</div>
+    </div>
+    <div class="ver now">
+      <div class="vhead"><span class="vname">0.2.0-rc.2</span><span class="vdate">09-29 · 当前</span><span class="vcov">11/18</span></div>
+      <div class="vbody">桌面端成熟（关窗后台跑 / 托盘）、pi-ai 0.87.1（41 厂商 1495 模型，GLM Coding Plan 直连）、Windows 沙箱诊断自修、异步问答、模型选择搜索。npm latest tag。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 四、能力矩阵 -->
+<section>
+  <h2><span class="no">04</span>能力覆盖矩阵（平台 × 插件 × 自研）</h2>
+  <div class="sec-desc">绿 = 平台原生，蓝 = 插件扩充，橙 = 自研资产。判定基于本机 boot + RPC + 浏览器 E2E 实测。</div>
+  <table>
+    <tr><th style="width:23%">业务象限</th><th style="width:12%">平台</th><th style="width:14%">插件</th><th style="width:14%">自研</th><th>判定</th></tr>
+    <tr><td class="cap">编码 / 脚本 / 数据处理</td><td><span class="tag t-g">原生</span></td><td></td><td><span class="tag t-o">school 方法论</span></td><td>满配，无需动作</td></tr>
+    <tr><td class="cap">通用文档 / PPT / 报告</td><td><span class="tag t-g">原生</span></td><td></td><td></td><td>满配（Office 预览 + 产物管线）</td></tr>
+    <tr><td class="cap">科研流程（文献 / 实验 / 论文）</td><td><span class="tag t-g">部分</span></td><td><span class="tag t-b">aris</span></td><td></td><td>满配，aris 87 技能独一档</td></tr>
+    <tr><td class="cap">会话记忆 / 知识召回</td><td><span class="tag t-g">原生</span></td><td><span class="tag t-b">OpenViking</span></td><td></td><td>已收敛唯一（曾三装，清二）</td></tr>
+    <tr><td class="cap">民机知识底座 / 适航检索</td><td></td><td></td><td><span class="tag t-o">civair-kb</span></td><td>有，内网待接真数据</td></tr>
+    <tr><td class="cap">FMEA / FTA 故障分析</td><td></td><td></td><td><span class="tag t-o">pdf-fta + fmea</span></td><td>有，两道门受控文档库</td></tr>
+    <tr><td class="cap">Benchmark 对比验证</td><td></td><td></td><td><span class="tag t-o">comac-bench</span></td><td>有，长跑脱离 + 断点续跑</td></tr>
+    <tr><td class="cap">PDF 深度精读</td><td></td><td><span class="tag t-b">pdf-reader</span></td><td></td><td>视觉模型逐页精读</td></tr>
+    <tr><td class="cap">定时 / 计划自动化</td><td><span class="tag t-g">原生</span></td><td><span class="tag t-b">automation</span></td><td></td><td>功能重叠容忍（分叉使用）</td></tr>
+    <tr><td class="cap">IM 消息桥接</td><td></td><td><span class="tag t-b">dsh-im</span></td><td></td><td>9 平台，生产可用性待验</td></tr>
+    <tr><td class="cap">平台运维自愈</td><td><span class="tag t-g">部分</span></td><td><span class="tag t-b">doctor + guard</span></td><td></td><td>半血（launcher 未接管启动链）</td></tr>
+  </table>
+  <p class="note" style="margin-top:10px">已清退插件：memsearch、weknora、routing-suite、univer-office、browser-skill（原因：前置缺失 / 记忆重复 / 价值边际 / 无适配版）。归档于 ~/.dsh/plugin-archive-0.2.0-cleanup。</p>
+</section>
+
+<!-- 五、缺口重估 -->
+<section>
+  <h2><span class="no">05</span>内网缺口重估（09-30 进展确认后）</h2>
+  <div class="sec-desc">原判 7 项缺口，经内网进展确认后收敛为 2 项主战场 + 1 项情报任务。信创因算力已用昇腾而事实性半解决。</div>
+  <div class="g-grid">
+    <div class="gcard gs-done">
+      <div class="ghead"><span class="gid">G1 模型端</span><span class="gstate">已解决</span></div>
+      <p>8×昇腾 910B3（6T 盘，全员可访）。DeepSeek V4 Flash + GLM 5.3 Flash，8bit 量化，07-31 正式版权重。开源国产权重随发随接，智谱 / 千问 Flash 多模态可立刻适配。昇腾即信创算力，G7 半边顺带解决。</p>
+      <div class="next" style="color:var(--green)">转入例行更新：新权重 → 量化 → 上线</div>
+    </div>
+    <div class="gcard gs-done">
+      <div class="ghead"><span class="gid">G2 + G3 工程桥</span><span class="gstate">已调通</span></div>
+      <p>CATIA 桥、STAR-CCM+ 桥均基于开源 MCP + 调节脚本 + 技能，本地已跑通。</p>
+      <div class="next" style="color:var(--green)">从开发任务降级为打包搬运：进离线包或内网 git</div>
+    </div>
+    <div class="gcard gs-run">
+      <div class="ghead"><span class="gid">G4 数据面</span><span class="gstate">主战场</span></div>
+      <p>方向修正：P-ACE 外部数据暂不接入，重点为内网 OA（CMOS 等平台）技术文件。已爬约 1 万份文档与技术报告，完整性未验收但年底交付口径已够。</p>
+      <div class="next" style="color:var(--accent)">Q4 头号工程：清洗 → 分类 → 建库 → 检索（civair-kb 模式复用，v1 有使用价值即可）</div>
+    </div>
+    <div class="gcard gs-half">
+      <div class="ghead"><span class="gid">G5 团队协作</span><span class="gstate">半解决</span></div>
+      <p>约束：内网端口暴露需登记。底子：模型服务器全员可访 + 个人虚拟机共享文件夹兜底。待办：Linux 组权限三步配置（建组 → 加人 → setgid 目录），无需 root，管理员 30 分钟。</p>
+      <div class="next" style="color:#b45309">短期：共享目录先行；长期：等端口审批</div>
+    </div>
+    <div class="gcard gs-info">
+      <div class="ghead"><span class="gid">G6 权限审计</span><span class="gstate">转情报</span></div>
+      <p>年底前不自研。跟踪 DSH 沙箱模型（research/08 已有底）+ 英伟达 / OpenAI / Anthropic 的 agent 权限设计 + 开源沙箱方案。</p>
+      <div class="next" style="color:var(--violet)">可产出：Agent 权限设计开源方案扫描报告（加分交付物）</div>
+    </div>
+    <div class="gcard gs-hold">
+      <div class="ghead"><span class="gid">G7 信创</span><span class="gstate">半解决</span></div>
+      <p>算力侧已事实满足（昇腾）。OS 适配（银河麒麟 / 统信）搁置，DSH 为 Node 跨平台，真到那天成本可控。</p>
+      <div class="next" style="color:var(--ink-3)">按需再议</div>
+    </div>
+  </div>
+</section>
+
+<!-- 六、交付路径 -->
+<section>
+  <h2><span class="no">06</span>年底交付路径</h2>
+  <div class="path">
+    <div class="path-item"><span class="pno">1</span><div><b>内网知识库 v1</b><span>1 万份 OA 文档清洗分类建库，civair-kb 检索管线复用，年底主交付物</span></div></div>
+    <div class="path-item"><span class="pno">2</span><div><b>DSH 离线包 v2</b><span>178MB 全离线包已建，补打包 CATIA / STAR 桥资产与隐私预置</span></div></div>
+    <div class="path-item"><span class="pno">3</span><div><b>模型例行更新机制</b><span>新 Flash 权重发布 → 8bit 量化 → 上线的标准流程</span></div></div>
+    <div class="path-item"><span class="pno">4</span><div><b>权限设计扫描报告（可选）</b><span>Agent 权限开源方案综述，G6 情报化交付</span></div></div>
+  </div>
+</section>
+
+<footer>
+  <span>DSH 能力地图与内网落地 · 依据 research/01-12 台账与 2026-09-30 内网进展确认</span>
+  <span>dsh 0.2.0-rc.2 · macOS arm64 · GLM Coding Plan 主路由</span>
+</footer>
+
+</div>
+</body>
+</html>

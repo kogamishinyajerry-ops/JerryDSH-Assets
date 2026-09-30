@@ -1,0 +1,8 @@
+{
+  "name": "jerry-aero",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "description": "民机航空域聚合插件：civair-kb 知识底座 + COMAC benchmark harness + PDF 故障树 + FMEA 两道门。2026-10 由 dsh-kb-civair/dsh-comac-benchmark/dsh-tool-pdf-fta/dsh-comac-suite(fmea) 整编而来。"
+}
