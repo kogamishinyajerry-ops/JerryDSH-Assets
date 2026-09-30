@@ -11,3 +11,7 @@
 - `sim-live-hub` 尚未取得真实仓库/spec，不能根据名称臆造 `module.json/parser.py` 兼容层。P1 知识库和 P2 产品壳继续后置。
 
 当前实现、已测范围和外部依赖分别见 [恢复](docs/recovery.md)、[仿真接入](docs/simulation-orchestration.md) 和当日工作记录。
+
+审查入口：[本仓 Draft PR #1](https://github.com/kogamishinyajerry-ops/JerryDSH-Assets/pull/1)、
+[工程核心 Draft PR #4](https://github.com/kogamishinyajerry-ops/dsh-sim/pull/4)。
+公开真实验证证据与完整测试结果已交付；自然语言在线端到端和生产工程验收仍待各自前提。
