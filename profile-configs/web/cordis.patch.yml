@@ -35,7 +35,7 @@
 - insert:
     - id: jerry-school
       name: /Users/Zhuanz/.dsh/plugins/jerry-school/index.js
-# Z.ai/BigModel 联网搜索 MCP 桥(~/.dsh/mcp/zai-mcp/bridge.mjs,e2e 实测 2026-08-31):
+# Z.ai/BigModel 联网搜索 MCP 桥(~/.dsh/mcp/zai-websearch/bridge.mjs,e2e 实测 2026-08-31):
 # 工具 mcp__zai__web_search = coding 端点内置 web_search 通道(走 GLM Coding
 # Plan 模型额度,不开 MCP 资源包即可用)。key 启动时从 macOS Keychain 服务
 # glm-api-key 读取,不落盘。官方 MCP 网关直通(webSearchSogou/Quark,需资源包)
@@ -48,7 +48,7 @@
         transport: stdio
         command: node
         args:
-          - /Users/Zhuanz/.dsh/mcp/zai-mcp/bridge.mjs
+          - /Users/Zhuanz/.dsh/mcp/zai-websearch/bridge.mjs
         toolCallTimeoutMs: 120000
         failOnStartupError: false
         reconnect:
