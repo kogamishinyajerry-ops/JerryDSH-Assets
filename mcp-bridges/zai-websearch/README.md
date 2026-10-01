@@ -1,4 +1,4 @@
-# zai-mcp — Z.ai / BigModel 联网搜索 MCP 桥
+# zai-websearch — Z.ai / BigModel 联网搜索 MCP 桥
 
 stdio MCP server（`bridge.mjs`），注册为 DSH web profile 的 `mcp__zai__*` 工具。
 
@@ -30,7 +30,13 @@ stdio MCP server（`bridge.mjs`），注册为 DSH web profile 的 `mcp__zai__*`
 | `ZAI_ENABLE_GATEWAY` | `0` | 置 `1` 额外暴露官方网关直通工具（先开资源包） |
 | `ZAI_CALL_TIMEOUT_MS` | `90000` | 单次调用超时 |
 
-## DSH 注册（~/.dsh/profiles/web/cordis.patch.yml）
+## 隔离恢复
+
+从仓库根运行 `node tools/recovery/recover.mjs prepare --target /absolute/path/to/new-recovery`，会把本桥复制到生成目录的 `dsh-home/mcp/zai-websearch/`，并将 web patch 的绝对路径一并改好。目录中包含锁定到 MCP SDK `1.30.0` 的 manifest 和 lockfile；prepare 不安装依赖、不访问 Keychain。详细步骤见 [锁版恢复说明](../../docs/recovery.md)。
+
+本桥仍使用 macOS Keychain。Linux 上的恢复预检只验证文件与配置，不会尝试读取凭证，也不能作为搜索调用通过的证明。
+
+## DSH 注册（示意：请使用生成 patch 中的实际绝对路径）
 
 ```yaml
 - insert:
@@ -40,7 +46,7 @@ stdio MCP server（`bridge.mjs`），注册为 DSH web profile 的 `mcp__zai__*`
         serverName: zai
         transport: stdio
         command: node
-        args: [/Users/Zhuanz/.dsh/mcp/zai-mcp/bridge.mjs]
+        args: ["/absolute/path/to/new-recovery/dsh-home/mcp/zai-websearch/bridge.mjs"]
         toolCallTimeoutMs: 120000
         failOnStartupError: false
         reconnect: { enabled: true }
@@ -51,6 +57,9 @@ stdio MCP server（`bridge.mjs`），注册为 DSH web profile 的 `mcp__zai__*`
 ## 测试
 
 ```bash
-cd ~/.dsh/mcp/zai-mcp && node e2e-test.mjs
+cd /absolute/path/to/new-recovery/dsh-home/mcp/zai-websearch
+node e2e-test.mjs
 # 期望：initialize ok / tools: web_search / call isError: false + 正文带【来源】
 ```
+
+这项 e2e 会实际调用搜索服务，需在具备凭证的 macOS 环境中单独执行；隔离恢复测试不会运行它。

@@ -1,0 +1,22 @@
+{
+  "name": "jerry-dsh-sim-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./delegation": "./delegation.js"
+  },
+  "description": "Four bounded native DSH delegations over the existing dsh-sim MCP tools.",
+  "engines": { "node": "^22.19.0 || >=24.0.0" },
+  "scripts": {
+    "test": "node --test ../../tests/orchestration/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-subagent": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "3.18.4"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "jerrydsh-recovery-2026-09-30",
+  "snapshotCommit": "6deac071f75817585ae28cda98a5430f83902ad2",
+  "dshVersion": "0.2.0-rc.2",
+  "node": "^22.19.0 || >=24.0.0",
+  "lockGeneration": {
+    "node": "24.19.0",
+    "npm": "11.9.0",
+    "ignoreScripts": true,
+    "legacyPeerDeps": {
+      "runtime": false,
+      "web": true,
+      "headless": true,
+      "fr-guard": true,
+      "zai-websearch": true
+    }
+  },
+  "snapshotHome": "/Users/Zhuanz",
+  "profiles": ["web", "headless", "fr-guard"],
+  "privacyDisabledIds": ["session-log-deepseek", "session-telemetry-otel"],
+  "doctor": {
+    "package": "@linxin666/dsh-doctor",
+    "version": "0.3.24",
+    "relativeFile": "lib/client.js",
+    "tarball": "https://registry.npmjs.org/@linxin666/dsh-doctor/-/dsh-doctor-0.3.24.tgz",
+    "tarballIntegrity": "sha512-ccwoPUVuGSPkWyMj1v9s5YLI+lLPW0cCzb5jzW3YtzCFY7qwrJg1DEa2huTkH9jmsX2Ok/OY7Wy7WGFjajOihg==",
+    "beforeSha256": "8eb17533dbb653195e70505211bf1ffb98a43edca2330a95baf12fe8436c3927",
+    "afterSha256": "312ee077393af048421d8d4abd14010e619c03d5d5253fdead76473a752d9315",
+    "before": "\t\tconst inject = [\n\t\t\t\"slots\",\n\t\t\t\"locale\",\n\t\t\t\"settingsScope\"\n\t\t];",
+    "after": "\t\tconst inject = [\n\t\t\t\"slots\",\n\t\t\t\"locale\"\n\t\t];"
+  }
+}

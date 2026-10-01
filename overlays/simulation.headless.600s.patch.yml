@@ -1,0 +1,52 @@
+# headless 直挂 overlay 的 600 秒版本：仅 stageTimeoutMs 180000→600000。
+# 原因：glm-4.7 的 prepare 委派（多步 MCP 调用）在默认 180s 可能被截断；
+# 本值为文档允许范围内的配置调优（1000–1800000），非代码改动。
+# 背景：headless profile 栈无 agent-preset-registry（preset 是 web 会话机制），
+# 因此不经 preset 包装、直接插入；工具范围与 web preset 完全一致；
+# session-log-deepseek 与 session-telemetry-otel 保持显式禁用。
+#
+# 脱敏说明：下方 `name: jerry-dsh-sim-orchestrator` 是占位符。实际使用前必须
+# 按 docs/simulation-orchestration.md「安装与无密钥配置验证」的生成器，把该行
+# 替换为本机插件副本 index.js 的绝对 file: URL（file:///<绝对路径>/index.js）。
+# 运行前需设置环境变量：DSH_SIM_PYTHON（隔离 [mcp] venv 解释器）、
+# DSH_SIM_API_URL、DSH_SIM_AGENT_PROJECTS（默认 proj_a，可用显式值覆盖）。
+- insert:
+    - id: simulation-persona
+      name: '@deepseek-ai/dsh-persona'
+      config:
+        complete: true
+        includeRuntimeContext: false
+        prefix: >-
+          You coordinate simulation work. Use sim_orchestrate for one bounded
+          plan, prepare, execute or review stage, retaining the task and evidence
+          references returned by dsh-sim. Preparation and run requests are asynchronous.
+          Missing inputs and human authorization are explicit blockers. An engineering
+          result is established by the service and its frozen evidence, never by an
+          Agent's successful turn. Keep REAL, MOCK and NOT_RUN distinctions visible.
+    - id: simulation-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: dsh_sim
+        transport: stdio
+        command: !!js process.env.DSH_SIM_PYTHON
+        args: ['-m', 'dsh_sim.mcp.server']
+        env:
+          DSH_SIM_API_URL: !!js process.env.DSH_SIM_API_URL || 'http://127.0.0.1:8600/api/v1'
+          DSH_SIM_AGENT_PROJECTS: !!js process.env.DSH_SIM_AGENT_PROJECTS || 'proj_a'
+          FASTMCP_CHECK_FOR_UPDATES: 'off'
+          FASTMCP_SHOW_SERVER_BANNER: 'false'
+        failOnStartupError: true
+        toolCallTimeoutMs: 60000
+    - id: simulation-orchestrator
+      name: jerry-dsh-sim-orchestrator
+      config:
+        providerName: spawn
+        serverName: dsh_sim
+        maxDepth: 1
+        stageTimeoutMs: 600000
+        maxInputBytes: 65536
+
+- id: session-log-deepseek
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
