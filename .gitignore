@@ -3,3 +3,22 @@ node_modules/
 .DS_Store
 *.tar.gz
 *.zip
+# Runtime data and credentials never belong in the asset repository.
+recovery/
+dsh-home/
+.dsh/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.credentials*
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.db
+*.sqlite
+*.sqlite3
+*.tmpdir/
