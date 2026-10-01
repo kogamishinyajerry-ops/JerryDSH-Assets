@@ -10,7 +10,7 @@ export const STAGES = Object.freeze({
   plan: Object.freeze({
     role: "planner",
     tools: Object.freeze(["list_capabilities", "get_task"]),
-    instruction: "核对目标、已发布能力包、模板引用、单位语义与缺失信息。只给出有来源的计划和问题；不创建执行任务，不猜测工程阈值。能力列表为空或没有适配能力时明确阻塞。",
+    instruction: "核对目标、能力包、模板引用、单位语义与缺失信息。list_capabilities 默认只返回正式 RELEASED 目录；对受限本地公开实验，必须再以 status=DRAFT（或 ANY）显式查询 validation-only / 未批准能力包，如 openfoam_channel@0.1.0。只有 RELEASED 与 DRAFT/ANY 查询都为空、或没有任何能力包能适配目标时才明确阻塞。DRAFT 不是工程批准：工程阈值保持 TBD，数值/适用性结论保持 INSUFFICIENT / UNCONFIRMED 语义，不得猜测或代填阈值。只给出有来源的计划和问题；不创建执行任务。",
   }),
   prepare: Object.freeze({
     role: "inputwriter",

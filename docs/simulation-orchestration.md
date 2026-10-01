@@ -86,7 +86,7 @@ cd "$JERRY_RECOVERY"
 
 | stage / 角色 | 允许的 MCP 操作 | 结束条件与后续 |
 |---|---|---|
-| `plan` / planner | list_capabilities、get_task | 明确适配能力、输入和缺口；未发布能力或缺字段时返回 blocked |
+| `plan` / planner | list_capabilities、get_task | 明确适配能力、输入和缺口；默认目录只含 RELEASED，受限本地公开实验需再以 `status=DRAFT`（或 `ANY`）显式查询 validation-only / 未批准包；两种查询都为空或缺字段时返回 blocked。DRAFT 不是工程批准，阈值保持 TBD |
 | `prepare` / inputwriter | list_capabilities、get_task、create_task、revise_task、prepare_task、get_preparation | 创建/修订输入并启动准备；回读未结束时返回 pending，差异显式阻塞 |
 | `execute` / runner | get_task、get_preparation、submit_runs、get_run、cancel_run | 仅提交给定授权绑定的任务；返回 run_ids，取消请求与已停止状态分别描述 |
 | `review` / reviewer | get_task、get_run、build_bundle、get_evidence、draft_review_issue | 获取冻结证据并整理结论或 DRAFT 问题；不做 ACCEPT |
@@ -102,7 +102,11 @@ cd "$JERRY_RECOVERY"
 }
 ```
 
-准备完成、人工工程授权已经形成后，才使用执行入口：
+准备完成、人工工程授权已经形成后，才使用执行入口。人工授权由执行台的
+**「确认并授权（不提交）」**按钮产生：该操作只展示 task、revision、preparation、
+`prepared_digest` 与执行预算，签发一次性确认并生成授权后即停止——面板不入队任何
+作业，首次提交必须由本表 execute 阶段的 AGENT runner 经 MCP `submit_runs` 使用该
+`authorization_id` 完成：
 
 ```json
 {
