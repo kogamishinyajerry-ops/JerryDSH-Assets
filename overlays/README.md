@@ -10,8 +10,13 @@ profile 栈没有 preset registry**，因此一次性 headless 会话需要把�
 
 | 文件 | 用途 |
 | --- | --- |
-| `simulation.headless.patch.yml` | 标准版（stageTimeoutMs 180000，与 web preset 一致） |
-| `simulation.headless.600s.patch.yml` | 600 秒版（唯一差异 `stageTimeoutMs: 600000`；glm-4.7 的 prepare 委派多步 MCP 链在 180s 下可能被截断——文档允许范围内的配置调优，非代码改动） |
+| `generate-headless-overlay.py` | **推荐入口**：参数化生成 headless 直挂 overlay（接受实际插件副本绝对路径；file: 入口自动转义；幂等同内容、差异拒绝；校验先于写入）。P0 返修后 headless overlay 一律由此生成 |
+| `simulation.headless.patch.yml` | 脱敏参考模板（stageTimeoutMs 180000，与 web preset 一致） |
+| `simulation.headless.600s.patch.yml` | 脱敏参考模板 600 秒版（唯一差异 `stageTimeoutMs: 600000`；glm-4.7 的 prepare 委派多步 MCP 链在 180s 下可能被截断——文档允许范围内的配置调优，非代码改动） |
+
+注意：手改脱敏模板已被 generate-headless-overlay.py 取代——后者强制绝对路径、
+校验插件副本（须含 index.js 与 cordis.patch.yml）、输出不得位于插件目录内，
+并在成功后打印**分开的**两步命令（`--dump-config` 验证与实际运行互不混淆）。
 
 ## 使用前必做
 
