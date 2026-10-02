@@ -24,7 +24,7 @@ def cwd(p):
 class GuardTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(prefix='dsh-guard-')
-        self.base=Path(self.tmp.name);self.root=self.base/'repo';self.root.mkdir()
+        self.base=Path(self.tmp.name).resolve();self.root=self.base/'repo';self.root.mkdir()
         self.g('init','-q');self.g('config','user.name','Synthetic Test');self.g('config','user.email','test@example.invalid')
         self.g('config','commit.gpgsign','false');self.g('config','core.hooksPath',str(self.base/'no-hooks'))
         self.write('README.md','Synthetic code handoff\n');self.g('add','README.md');self.g('commit','-qm','baseline')
