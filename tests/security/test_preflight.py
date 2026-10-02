@@ -77,6 +77,16 @@ class GuardTests(unittest.TestCase):
         self.stage('state.sqlite','synthetic');self.assertTrue(m.scan(self.root,'staged'))
     def test_tempdir_blocked(self):
         self.stage('.patch.tmpdir/patch.tmp','synthetic');self.assertTrue(m.scan(self.root,'staged'))
+    def test_typechange_symlink_to_secret_is_detected(self):
+        link=self.root/'config.py';link.symlink_to('README.md');self.g('add','config.py');self.g('commit','-qm','symlink baseline')
+        link.unlink();self.stage('config.py',"value = '"+'sk-'+'A'*32+"'\n")
+        self.assertEqual(self.g('diff','--cached','--name-status').strip(),'T\tconfig.py')
+        self.assertTrue(m.scan(self.root,'staged'))
+    def test_typechange_regular_to_symlink_is_detected(self):
+        self.stage('config.py','answer = None\n');self.g('commit','-qm','regular baseline')
+        p=self.root/'config.py';p.unlink();p.symlink_to('README.md');self.g('add','config.py')
+        self.assertEqual(self.g('diff','--cached','--name-status').strip(),'T\tconfig.py')
+        self.assertTrue(m.scan(self.root,'staged'))
     def test_intermediate_secret_detected(self):
         self.stage('config.py',"token = '"+'ghp_'+'A'*32+"'\n");self.g('commit','-qm','synthetic-bad')
         self.g('rm','config.py');self.g('commit','-qm','remove')
