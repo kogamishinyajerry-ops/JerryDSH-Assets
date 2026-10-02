@@ -1,0 +1,8 @@
+#!/bin/sh
+root=$(git config --local --get dsh.expectedRoot) || { echo 'Guard root not configured' >&2; exit 2; }
+zero=0000000000000000000000000000000000000000
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ "$local_sha" = "$zero" ] && continue
+    python3 -S "$root/tools/security/preflight.py" --expected-root "$root" \
+      --mode range --base "$remote_sha" --tip "$local_sha" || exit $?
+done

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Opt-in: see tools/security/README.md. Never install over an existing hook silently.
+root=$(git config --local --get dsh.expectedRoot) || { echo 'Guard root not configured' >&2; exit 2; }
+exec python3 -S "$root/tools/security/preflight.py" --expected-root "$root" --mode staged

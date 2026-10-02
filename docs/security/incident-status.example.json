@@ -1,0 +1,11 @@
+{
+  "schema": "local-incident-receipt/1",
+  "status": "PENDING_OPERATOR_VERIFICATION",
+  "provider": "ZAI",
+  "old_key_revoked_at": null,
+  "provider_receipt_reference": null,
+  "local_instances_updated_at": null,
+  "confirmed_by": null,
+  "history_cleanup": "NOT_AUTHORIZED_OR_EXECUTED",
+  "note": "Template only. Do not include key values, copied credentials, or a claimed success without a provider-side action."
+}
