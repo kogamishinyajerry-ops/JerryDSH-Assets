@@ -83,7 +83,7 @@ def inspect(name: str, data: bytes) -> list[dict[str, str]]:
 def entries(root: Path, mode: str, ref: str = 'HEAD') -> list[tuple[str, str, str]]:
     result = []
     if mode == 'staged':
-        changed = set(git(root, 'diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z').split(b'\0'))
+        changed = set(git(root, 'diff', '--cached', '--name-only', '--diff-filter=ACMRT', '-z').split(b'\0'))
         rows = git(root, 'ls-files', '--stage', '-z').split(b'\0')
         for row in filter(None, rows):
             meta, name = row.split(b'\t', 1)
